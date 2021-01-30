@@ -8,6 +8,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.Inventory;
 import uyora.core.Main;
 import uyora.core.charactercreation.CharacterCreationMenu;
+import uyora.core.filemanagement.PlayerFileManager;
 
 public class Join implements Listener {
 
@@ -21,15 +22,16 @@ public class Join implements Listener {
     @EventHandler
     public void onJoin(PlayerJoinEvent event){
         Player player = event.getPlayer();
-
+        if (!player.hasPermission("uyora.staff")) {
+            player.teleport(Bukkit.getWorld("Uyora").getSpawnLocation());
+        }
         //Join Message
         event.setJoinMessage(main.TCC("&8" + player.getDisplayName() + "&a has joined Uyora!"));
 
-        //Create Player File
-        if (!main.getPlayerFileManager().getPlayerFile(player).exists()){main.getPlayerFileManager().createPlayerFile(player);}
-
-        //Character Selection
-        player.openInventory(main.getCharacterCreationMenu().menu(player));
+        //Load Player File
+        PlayerFileManager manager = new PlayerFileManager(main, player);
+        manager.loadPlayerFile();
+        manager.setActive(player, 0);
     }
 
 

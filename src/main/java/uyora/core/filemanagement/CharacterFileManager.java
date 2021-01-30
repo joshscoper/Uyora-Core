@@ -1,8 +1,12 @@
 package uyora.core.filemanagement;
 
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.util.FileUtil;
 import uyora.core.Main;
 import uyora.core.classes.CharacterClass;
 
@@ -17,36 +21,44 @@ public class CharacterFileManager {
 
     private int max_chars = 5;
 
-    private File file;
-    private FileConfiguration fileConfiguration;
-
     private File charFile;
+    private FileConfiguration charConfig;
+
+    private PlayerFileManager manager;
 
     public CharacterFileManager(Main main, int character, Player player){
         this.character = character;
         this.player = player;
         this.main = main;
-        charFile = new File(main.getPlayerFileManager().getPlayerFile(player), "Character_" + character + ".yml");
+        manager = new PlayerFileManager(main, player);
+        this.charFile = new File(manager.getDirectory(), "Character_" + character + ".yml");
+        charConfig = YamlConfiguration.loadConfiguration(charFile);
     }
 
     public void createCharacterFile(){
-        file = main.getPlayerFileManager().getPlayerFile(player);
-        fileConfiguration = main.getPlayerFileManager().getPlayerConfig(player);
-        if (fileConfiguration.getInt("Characters") < max_chars){
-            FileConfiguration charConfig = YamlConfiguration.loadConfiguration(charFile);
+        if (manager.getCharacters() < max_chars){
+            FileConfiguration charConfiguration = YamlConfiguration.loadConfiguration(charFile);
             if (!charFile.exists()){
                 try {
                     charFile.createNewFile();
 
-                    fileConfiguration.set("Class", "none");
-                    fileConfiguration.set("Level.Combat", 0);
-                    fileConfiguration.set("Balance", 0);
+                    charConfiguration.createSection("Class");
+                    charConfiguration.createSection("Level.Combat");
+                    charConfiguration.createSection("Balance");
+                    charConfiguration.createSection("Location.World");
+                    charConfiguration.createSection("Location.X");
+                    charConfiguration.createSection("Location.Y");
+                    charConfiguration.createSection("Location.Z");
+
+                    charConfiguration.set("Class", "Undecided");
+                    charConfiguration.set("Level.Combat", 0);
+                    charConfiguration.set("Balance", 0);
 
 
-                    main.getPlayerFileManager().addCharacter(player);
-                    main.getPlayerFileManager().setActiveCharacter(player, character);
-
-                    saveFile(fileConfiguration, file);
+                    manager.getData().set("Active_Character", character);
+                    manager.addCharacter(player);
+                    saveFile(charConfiguration, charFile);
+                    this.charConfig = charConfiguration;
                 } catch (IOException e){
                     e.printStackTrace();
                 }
@@ -54,6 +66,21 @@ public class CharacterFileManager {
         }
     }
 
+    public File getCharFile(){
+        return charFile;
+    }
+
+    public FileConfiguration getCharConfiguration(){
+        return charConfig;
+    }
+
+    public String getClazz(){
+        return charConfig.getString("Class");
+    }
+
+    public int getLevel(){
+        return charConfig.getInt("Level.Combat");
+    }
 
     public boolean characterExists(){
         if (!charFile.exists()){
@@ -61,6 +88,23 @@ public class CharacterFileManager {
         } else {
             return true;
         }
+    }
+
+    public void setLocation(){
+        charConfig.set("Location.World", player.getWorld().getName());
+        charConfig.set("Location.X", player.getLocation().getX());
+        charConfig.set("Location.Y", player.getLocation().getY());
+        charConfig.set("Location.Z", player.getLocation().getZ());
+        saveFile(charConfig, charFile);
+    }
+
+    public Location getLocation(){
+        String world = charConfig.getString("Location.World");
+        double x = charConfig.getDouble("Location.X");
+        double y = charConfig.getDouble("Location.Y");
+        double z = charConfig.getDouble("Location.Z");
+        Location location = new Location(Bukkit.getWorld(world),x,y,z);
+        return location;
     }
 
     public void saveFile(FileConfiguration fileConfiguration, File file){
@@ -71,32 +115,12 @@ public class CharacterFileManager {
         }
     }
 
-    public String getClazz(){
-        return fileConfiguration.getString("Class");
+
+    public void deleteFile(){
+        charFile.delete();
+        manager.removeCharacter();
     }
 
-    public void setClazz(CharacterClass clazz){
-        fileConfiguration.set("Class", clazz.getPath());
-        saveFile(fileConfiguration, charFile);
-    }
-
-    public int getCombatLevel(){
-        return fileConfiguration.getInt("Level.Combat");
-    }
-
-    public void setCombatLevel(int level){
-        fileConfiguration.set("Level.Combat", level + getCombatLevel());
-        saveFile(fileConfiguration, charFile);
-    }
-
-    public int getBalance(){
-        return fileConfiguration.getInt("Balance");
-    }
-
-    public void setBalance(int balance){
-        fileConfiguration.set("Balance", balance + getBalance());
-        saveFile(fileConfiguration, charFile);
-    }
 
 
 }

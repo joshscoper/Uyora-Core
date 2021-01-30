@@ -25,14 +25,21 @@ public class CharacterCreationMenu {
         Inventory inventory = Bukkit.createInventory(null, InventoryType.HOPPER, main.TCC("     &a&lSelect Your Character"));
         ItemStack item;
         for (int i = 0; i < inventory.getSize(); i++){
-            CharacterFileManager charFile = new CharacterFileManager(main, i, player);
+            CharacterFileManager charFile = new CharacterFileManager(main, i + 1, player);
             if (charFile.characterExists()){
                 item = new ItemStack(Material.PAPER);
                 ItemMeta meta = item.getItemMeta();
-                meta.setDisplayName(main.TCC("&3&lCharacter &7[&b" + i + "&7]"));
+                int character = i + 1;
+                meta.setDisplayName(main.TCC("&3&lCharacter &7[&b" + character + "&7]"));
                 ArrayList<String> lore = new ArrayList();
-                lore.add(main.TCC("&e&lClass: &7" + charFile.getClazz()));
-                lore.add(main.TCC("&e&lLevel: &7" + charFile.getCombatLevel()));
+                String clazz = charFile.getClazz();
+                if (clazz != null){
+                    lore.add(main.TCC("&a&lClass &7» &e" + clazz));
+                } else {
+                    lore.add(main.TCC("&a&lClass &7» &cError Loading Information"));
+                }
+                lore.add(main.TCC("&a&lLevel &7» &e" + charFile.getLevel()));
+                lore.add(main.TCC("&cRight-Click to delete"));
                 meta.setLore(lore);
                 item.setItemMeta(meta);
 

@@ -1,6 +1,7 @@
 package uyora.core;
 
 import org.bukkit.Material;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -29,6 +30,25 @@ public class MenuItems {
         return item;
     }
 
+    public ItemStack confirm(){
+        ItemStack item = new ItemStack(Material.MUSIC_DISC_CHIRP);
+        ItemMeta meta = item.getItemMeta();
+        meta.setDisplayName(main.TCC("&2&lConfirm"));
+        meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+        meta.addItemFlags(ItemFlag.values());
+        item.setItemMeta(meta);
+        return item;
+    }
+
+    public ItemStack cancel(){
+        ItemStack item = new ItemStack(Material.MUSIC_DISC_FAR);
+        ItemMeta meta = item.getItemMeta();
+        meta.setDisplayName(main.TCC("&c&lCancel"));
+        meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+        meta.addItemFlags(ItemFlag.values());
+        item.setItemMeta(meta);
+        return item;
+    }
 
 
 
