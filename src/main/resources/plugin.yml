@@ -1,0 +1,8 @@
+name: UyoraCore
+version: ${project.version}
+main: uyora.core.Main
+api-version: 1.16
+prefix: UYORA
+authors: [joshscoper]
+description: UyoraCoreFunctions
+website: uyora.net
