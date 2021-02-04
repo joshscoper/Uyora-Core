@@ -49,6 +49,10 @@ public class CharacterFileManager {
                     charConfiguration.createSection("Location.X");
                     charConfiguration.createSection("Location.Y");
                     charConfiguration.createSection("Location.Z");
+                    charConfiguration.createSection("Inn.World");
+                    charConfiguration.createSection("Inn.X");
+                    charConfiguration.createSection("Inn.Y");
+                    charConfiguration.createSection("Inn.Z");
 
                     charConfiguration.set("Class", "Undecided");
                     charConfiguration.set("Level.Combat", 0);
@@ -82,12 +86,31 @@ public class CharacterFileManager {
         return charConfig.getInt("Level.Combat");
     }
 
+    public int getBalance(){return charConfig.getInt("Balance");}
+
     public boolean characterExists(){
         if (!charFile.exists()){
             return false;
         } else {
             return true;
         }
+    }
+
+    public Location getInn(){
+        String world = charConfig.getString("Inn.World");
+        double x = charConfig.getDouble("Inn.X");
+        double y = charConfig.getDouble("Inn.Y");
+        double z = charConfig.getDouble("Inn.Z");
+        Location location = new Location(Bukkit.getWorld(world),x,y,z);
+        return location;
+    }
+
+    public void setInn(){
+        charConfig.set("Inn.World", player.getWorld().getName());
+        charConfig.set("Inn.X", player.getLocation().getX());
+        charConfig.set("Inn.Y", player.getLocation().getY());
+        charConfig.set("Inn.Z", player.getLocation().getZ());
+        saveFile(charConfig, charFile);
     }
 
     public void setLocation(){

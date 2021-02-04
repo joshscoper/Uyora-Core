@@ -9,6 +9,8 @@ import org.bukkit.inventory.Inventory;
 import uyora.core.Main;
 import uyora.core.charactercreation.CharacterCreationMenu;
 import uyora.core.filemanagement.PlayerFileManager;
+import uyora.core.inventoryItems.CharacterInfo;
+import uyora.core.scoreboard.ScoreboardHandler;
 
 public class Join implements Listener {
 
@@ -32,6 +34,21 @@ public class Join implements Listener {
         PlayerFileManager manager = new PlayerFileManager(main, player);
         manager.loadPlayerFile();
         manager.setActive(player, 0);
+
+        //Player Items
+        CharacterInfo infoItems = new CharacterInfo(main);
+        Bukkit.getScheduler().scheduleSyncDelayedTask(main, new Runnable() {
+            @Override
+            public void run() {
+                if (player.getInventory().getItem(8) != infoItems.infoBook()){
+                    player.getInventory().setItem(8, infoItems.infoBook());
+                }
+            }
+        },20);
+
+        //Scoreboard
+        ScoreboardHandler scoreboard = new ScoreboardHandler(main, player);
+        scoreboard.updater(player);
     }
 
 

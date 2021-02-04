@@ -8,6 +8,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import uyora.core.charactercreation.CharacterCreationMenu;
 import uyora.core.events.*;
 import uyora.core.filemanagement.PlayerFileManager;
+import uyora.core.inspect.InspectMenu;
 
 import java.util.HashMap;
 import java.util.regex.Matcher;
@@ -18,6 +19,7 @@ public final class Main extends JavaPlugin {
     private MenuItems menuItems;
     private CharacterCreationMenu characterCreationMenu;
     public HashMap<Player, Integer> confirmDeleteMap;
+    private InspectMenu inspectMenu;
 
     @Override
     public void onEnable() {
@@ -30,6 +32,11 @@ public final class Main extends JavaPlugin {
         new Chat(this);
         new InventoryInteract(this);
         new NPCInteract(this);
+        new Drop(this);
+        new ItemInteract(this);
+        new Death(this);
+        inspectMenu = new InspectMenu(this);
+        settingsCheck();
     }
 
     @Override
@@ -50,7 +57,54 @@ public final class Main extends JavaPlugin {
         return ChatColor.translateAlternateColorCodes('&', string);
     }
 
+
+    public void settingsCheck(){
+            //Hide Players
+        Bukkit.getScheduler().runTaskTimer(this, new Runnable() {
+            @Override
+            public void run() {
+                for (Player player : Bukkit.getOnlinePlayers()) {
+                    hidePlayers(player);
+                    streamerMode(player);
+                }
+            }
+        },20,20);
+    }
+
+    public void hidePlayers(Player player){
+        PlayerFileManager manager = new PlayerFileManager(this,player);
+        if (manager.getData().getBoolean("Settings.Hide_Players") == true){
+            for (Player p : Bukkit.getOnlinePlayers()){
+                if (p != player) {
+                    player.hidePlayer(this, p);
+                }
+            }
+        } else {
+            for (Player p : Bukkit.getOnlinePlayers()){
+                if (p != player) {
+                    player.showPlayer(this, p);
+                }
+            }
+        }
+    }
+
+    public void streamerMode(Player player){
+        PlayerFileManager manager = new PlayerFileManager(this, player);
+        for (Player p : Bukkit.getOnlinePlayers()){
+            String name;
+            if (p != player) {
+                if (manager.getData().getBoolean("Settings.Streamer_Mode") == true) {
+                        name = "&k" + p.getDisplayName();
+                } else {
+                        name = p.getDisplayName().replaceAll("&k", "");
+                }
+                p.setDisplayName(name);
+            }
+        }
+    }
+
     public MenuItems getMenuItems(){return menuItems;}
     public CharacterCreationMenu getCharacterCreationMenu(){return characterCreationMenu;}
     public HashMap<Player,Integer> getConfirmDeleteMap(){return confirmDeleteMap;}
+    public InspectMenu getInspectMenu(){return inspectMenu;}
 }
