@@ -1,8 +1,11 @@
 package uyora.core.events;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Villager;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
@@ -26,6 +29,15 @@ public class NPCInteract implements Listener {
     public void onInteract(PlayerInteractAtEntityEvent event){
         Player player = event.getPlayer();
         Entity clicked = event.getRightClicked();
+        if (clicked instanceof Villager){
+            if (clicked.getName().equals(main.TCC("&7&lPaladin"))){
+                PlayerFileManager playerFileManager = new PlayerFileManager(main, player);
+                CharacterFileManager characterFileManager = new CharacterFileManager(main, playerFileManager.getActive(), player);
+                String cls = ChatColor.stripColor(clicked.getName());
+                characterFileManager.setClazz(cls);
+                player.sendMessage(main.TCC("&9&lUyora &7» &aYou have chosen to be a &e&lPaladin&a!"));
+            }
+        }
         if (clicked instanceof Player) {
             if (event.getHand().equals(EquipmentSlot.HAND)) {
                 if (Bukkit.getOnlinePlayers().contains(clicked)) {

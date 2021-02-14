@@ -78,6 +78,11 @@ public class CharacterFileManager {
         return charConfig;
     }
 
+    public void setClazz(String clazz){
+        charConfig.set("Class", clazz);
+        saveFile(charConfig, charFile);
+    }
+
     public String getClazz(){
         return charConfig.getString("Class");
     }
